@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Flow">
+<meta name="theme-color" content="#0d0907">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* One narrow column on a dark, warm, grainy ground; frosted cards; two-tone headlines (dim line, bright line). */
+:root{--bg:#0b0908;--fg:#f7f4f0;--dim:rgba(247,244,240,.48);--faint:rgba(247,244,240,.14);--glass:rgba(255,255,255,.07);--line:rgba(255,255,255,.13);--glow:#ff7a2f;--glow-rgb:255,122,47;
+  --f:"Manrope","Helvetica Neue",Helvetica,Arial,sans-serif;color-scheme:dark}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.5 var(--f);font-variant-numeric:tabular-nums;
+  padding:env(safe-area-inset-top,0) max(16px,env(safe-area-inset-right,0px)) calc(70px + env(safe-area-inset-bottom,0)) max(16px,env(safe-area-inset-left,0px))}
+body::before{content:"";position:fixed;inset:-20%;z-index:0;pointer-events:none;filter:blur(70px);
+  background:radial-gradient(38% 30% at 84% 90%,rgba(255,110,30,.55),transparent 70%),radial-gradient(30% 26% at 10% 6%,rgba(255,170,90,.26),transparent 70%),radial-gradient(26% 22% at 72% 16%,rgba(200,70,60,.20),transparent 70%)}
+/* grain */
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;padding:22px 0 6px}
+.logo{display:flex;align-items:center;gap:10px;font:600 16px var(--f)}
+.logo i{width:26px;height:26px;border-radius:50%;background:var(--fg);display:block;box-shadow:0 0 24px rgba(var(--glow-rgb),.75)}
+.top{display:flex;gap:14px;align-items:center;font:500 12px var(--f);color:var(--dim)}
+.top button{all:unset;cursor:pointer;color:var(--dim)}
+.top button:hover{color:var(--fg)}
+h1{font:400 clamp(32px,8vw,50px)/1.08 var(--f);letter-spacing:-.035em;margin:34px 0 10px;overflow-wrap:anywhere}
+h1 span{display:block;color:var(--dim)}
+.lead{color:var(--dim);margin:0 0 22px;font-size:15px;max-width:46ch}
+.k{font:500 12px var(--f);color:var(--dim);margin:26px 0 10px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:22px;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.tasks{display:grid;gap:10px}
+.tasks .main{all:unset;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;width:100%;padding:16px 18px;cursor:pointer}
+.tasks b{font:500 17px/1.3 var(--f);letter-spacing:-.01em;overflow-wrap:anywhere}
+.tasks .arrow{align-self:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font-size:16px}
+.tasks .meta{grid-column:1/-1;font-size:13px;color:var(--dim)}
+.tasks .meta em{font-style:normal;color:var(--glow)}
+.bar{grid-column:1/-1;height:3px;background:var(--faint);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--glow);box-shadow:0 0 12px var(--glow)}
+.fin b{color:var(--dim);text-decoration:line-through}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{font:500 14px var(--f);color:var(--fg);background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:9px 16px;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn{font:500 15px var(--f);color:var(--fg);background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:12px 20px;cursor:pointer}
+.btn.go{background:var(--fg);color:var(--bg);border-color:var(--fg);font-weight:600;padding:14px 26px;box-shadow:0 0 34px rgba(var(--glow-rgb),.5)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--dim)}
+.btn:disabled{opacity:.3;cursor:default;box-shadow:none}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.ask{font:500 13px var(--f);color:var(--glow);display:flex;gap:8px;align-items:center;margin:26px 0 10px}
+.ask::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--glow);box-shadow:0 0 10px var(--glow)}
+.think{color:var(--dim);font-size:14px;margin-top:22px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.4}}
+.note{padding:14px 18px;font-size:14px;color:var(--dim)}.note b{color:var(--fg);font-weight:500}
+textarea,input{width:100%;box-sizing:border-box;font:400 15px var(--f);color:var(--fg);background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+textarea{min-height:70px;resize:vertical}
+input.own{margin-top:10px;border-radius:999px;padding:9px 16px;font-size:14px;background:transparent}
+textarea::placeholder,input::placeholder{color:var(--dim)}
+.timer{padding:22px 22px 24px;margin-top:22px}
+.trow{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.num{font:600 clamp(56px,17vw,88px)/1 var(--f);letter-spacing:-.04em}
+.tl{color:var(--dim);font-size:15px;margin-top:6px}
+.ok{flex:none;width:54px;height:54px;border-radius:50%;border:0;background:rgba(var(--glow-rgb),.22);color:var(--glow);font-size:24px;cursor:pointer}
+.ok:hover{background:rgba(var(--glow-rgb),.36)}
+.segs{display:flex;gap:3px;margin-top:68px;height:56px;padding:3px;border:1px solid rgba(var(--glow-rgb),.4);border-radius:14px;background:rgba(var(--glow-rgb),.07)}
+.seg{position:relative;border-radius:10px;background:rgba(var(--glow-rgb),.16);min-width:8px}
+.seg.d{background:rgba(var(--glow-rgb),.42)}
+.seg.c{background:repeating-linear-gradient(135deg,rgba(var(--glow-rgb),.85) 0 6px,rgba(var(--glow-rgb),.64) 6px 12px)}
+.needle{position:absolute;top:-12px;bottom:-12px;left:0;width:2px;background:#fff;border-radius:1px}
+.tag{position:absolute;bottom:calc(100% + 16px);display:flex;gap:8px;align-items:center;background:var(--glow);color:#1a0b02;font:600 13px var(--f);padding:7px 12px;border-radius:10px;max-width:min(72vw,380px)}
+.tag span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag b{flex:none;width:18px;height:18px;border-radius:50%;background:#1a0b02;color:var(--glow);font-size:11px;display:grid;place-items:center}
+.sess{color:var(--dim);font-size:13px;margin-top:14px}
+.steps{list-style:none;margin:0;padding:6px 18px}
+.steps li{border-bottom:1px solid var(--faint)}
+.steps li:last-child{border-bottom:0}
+.steps button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:12px;width:100%;padding:12px 0;align-items:baseline;font-size:15px}
+.steps i{width:9px;height:9px;border:1px solid var(--dim);border-radius:50%;display:block}
+.steps .d i{background:var(--glow);border-color:var(--glow)}
+.steps .d span{color:var(--dim);text-decoration:line-through}
+.steps time{font-size:12px;color:var(--dim)}
+.stepper{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.stepper b{font:300 40px var(--f);letter-spacing:-.03em;min-width:5ch}
+#banner{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0));z-index:5;max-width:528px;margin:0 auto;padding:12px 16px;font-size:14px;border-radius:14px;background:#2a1208;border:1px solid rgba(var(--glow-rgb),.5)}
+form.auth{display:grid;gap:12px;margin-top:8px}
+.msg{font-size:14px;color:var(--dim);min-height:20px}
+.ta{position:relative}
+.ta textarea{padding-bottom:40px}
+.mic{position:absolute;right:10px;bottom:12px;font:500 12px var(--f);color:var(--fg);background:rgba(255,255,255,.1);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.mic.on{background:var(--glow);border-color:var(--glow);color:#1a0b02}
+.nudge{margin-top:14px;padding:16px 18px}.nudge b{display:block;margin-bottom:10px;font-weight:500;color:var(--fg)}
+.ed{list-style:none;margin:18px 0 0;padding:6px 18px}
+.ed li{padding:12px 0;border-bottom:1px solid var(--faint)}.ed li:last-child{border-bottom:0}
+.ed .er{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.ed .nm{all:unset;cursor:text;font-size:15px;overflow-wrap:anywhere}
+.ed time{font-size:12px;color:var(--dim);white-space:nowrap}
+.ed .eb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ed .eb button{font:500 12px var(--f);color:var(--dim);background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer}
+.ed .eb button:hover{color:var(--fg)}
+.pick{border-color:rgba(var(--glow-rgb),.6);box-shadow:0 0 30px rgba(var(--glow-rgb),.18)}
+.win{padding:24px 22px;margin-top:22px}
+.bar.big{height:6px;margin-top:22px;border-radius:3px}
+.bar.big i{animation:grow 1s ease-out}
+@keyframes grow{from{width:0}}
+.trow2{display:flex;align-items:stretch}
+.trow2 .main{flex:1;min-width:0}
+.more{all:unset;cursor:pointer;padding:0 16px 0 4px;color:var(--dim);font-size:20px;display:grid;place-items:center}
+.more:hover{color:var(--fg)}
+.tacts{padding:0 18px 14px}
+.tacts button{font-size:13px;padding:6px 13px}
+.add{margin:0 0 6px}
+.add input{border-radius:999px;padding:14px 86px 14px 20px;font-size:16px}
+.add .mic{bottom:9px}
+.donel{list-style:none;margin:0;padding:0}
+.donel button{all:unset;cursor:pointer;display:block;width:100%;padding:8px 2px;font-size:14px;color:var(--dim);text-decoration:line-through}
+#banner button{all:unset;cursor:pointer;margin-left:10px;color:var(--glow);font-weight:600}
+[hidden]{display:none!important}
+@media(pointer:coarse){textarea,input,input.own{font-size:16px}}
+html{-webkit-text-size-adjust:100%}
+.cal{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:14px 0 0;padding-bottom:2px}
+.cal::-webkit-scrollbar{display:none}
+.cal span{flex:none;font-size:13px;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;white-space:nowrap}
+.cal span b{font-weight:600;color:var(--glow);margin-right:6px}
+.cal span.past{opacity:.4}
+.link{all:unset;cursor:pointer;color:var(--glow);font:500 13px var(--f)}
+.rowl{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 2px 0;font-size:13px;color:var(--dim)}
+.eve{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;margin-top:16px;font-size:14px}
+.kept{list-style:none;margin:0;padding:0 18px 12px;font-size:14px}
+.kept li{padding:4px 0;color:var(--fg)}.kept li.d{color:var(--dim);text-decoration:line-through}
+.kept.flat{padding:0}
+.dl{list-style:none;margin:0;padding:4px 18px}
+.dl li{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--faint)}.dl li:last-child{border-bottom:0}
+.dl div{flex:1;min-width:0;font-size:15px;overflow-wrap:anywhere}.dl small{display:block;color:var(--dim);font-size:12px}
+.dl .x{all:unset;cursor:pointer;color:var(--dim);padding:4px 8px;font-size:18px}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.think,.bar.big i{animation:none}}
+/* ---- look v3: flat, hairlines, small mono capitals (after Sunny's reference) ---- */
+:root{--bg:#0d0907;--line:rgba(255,255,255,.16);--faint:rgba(255,255,255,.09);--dim:rgba(247,244,240,.52);--f:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif;--m:"DM Mono",ui-monospace,Menlo,monospace}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+input,textarea{-webkit-user-select:text;user-select:text}
+body::before{filter:blur(60px);background:radial-gradient(62% 46% at 100% 100%,rgba(176,74,34,.78),transparent 70%),radial-gradient(50% 36% at 0% 60%,rgba(140,52,24,.5),transparent 70%),radial-gradient(40% 24% at 82% 0%,rgba(120,40,24,.28),transparent 70%)}
+.sbar{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top,0px);z-index:4;background:rgba(13,9,7,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+header{padding:18px 0 0}
+.logo{font:500 15px var(--f)}.logo i{width:16px;height:16px;box-shadow:none}
+.top,.top button{font:400 11px var(--m);letter-spacing:.08em;text-transform:uppercase}
+h1{font:400 clamp(34px,9.4vw,52px)/1.04 var(--f);letter-spacing:-.035em;margin:38px 0 12px}
+h1.big{font-size:clamp(52px,15vw,76px);margin-bottom:14px}
+h1 span{font:400 11px/1.4 var(--m);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.sub,.think{font:400 11px var(--m);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.sub{margin:0 0 28px}
+.k{font:400 17px var(--f);color:var(--fg);margin:38px 0 0;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.k+.chips,.k+input,.k+.ta,.k+.kept,.k+.stepper,.k+.donel{margin-top:14px}
+.card{background:transparent;border:0;border-radius:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+.tasks{gap:0}
+.tasks .card{border-bottom:1px solid var(--faint)}
+.tasks .main{padding:17px 0;gap:6px 14px}
+.tasks b{font:400 18px/1.25 var(--f)}
+.tasks .arrow{width:auto;height:auto;background:none;font:400 19px var(--f);color:var(--dim)}
+.tasks .meta{font-size:14px}
+.tasks .meta em,.link{font:400 11px var(--m);letter-spacing:.08em;text-transform:uppercase}
+.pick{box-shadow:none}
+.bar{height:2px}.bar i{box-shadow:none}
+.more{padding:0 0 0 14px}
+.tacts{padding:0 0 16px}
+.chips button{font:400 14px var(--f);background:transparent;padding:8px 15px}
+.btn{font:400 11px var(--m);letter-spacing:.1em;text-transform:uppercase;background:transparent;padding:14px 20px}
+.btn.go{flex:1 1 100%;background:var(--fg);font-weight:500;padding:18px 26px;box-shadow:none}
+.btn.go::after{content:"  →"}
+.btn.ghost{border-color:transparent}
+.acts{margin-top:34px}
+.ask{font:400 17px var(--f);color:var(--fg);margin:34px 0 12px}.ask::before{display:none}
+input{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 0;font:400 16px var(--f)}
+textarea{background:transparent;border-radius:14px;font:400 16px var(--f)}
+input.own{border-radius:0;padding:10px 0;margin-top:12px;font-size:15px}
+.add input{border-radius:0;padding:14px 80px 14px 0;font-size:17px}
+.mic{background:transparent;font:400 10px var(--m);letter-spacing:.1em;text-transform:uppercase;padding:6px 12px}
+.add .mic{right:0;bottom:11px}
+.rowl{margin:10px 0 0;font-size:12px}
+.cal{margin-top:24px;gap:20px}
+.cal span{border:0;border-radius:0;padding:0;font:400 11px var(--m);letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}.cal span b{font-weight:400}
+.eve{padding:14px 0;margin-top:20px;border-top:1px solid var(--faint);border-bottom:1px solid var(--faint)}
+.note{padding:14px 0;border-bottom:1px solid var(--faint)}
+.timer,.win,.nudge{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:20px}
+.num{font-weight:400}
+.steps,.ed,.dl{padding-left:0;padding-right:0}
+.kept{padding:0 0 14px}
+.donel button{padding:10px 0;font-size:15px}
+.td #add,.td .rowl,.td .eve,.td .more{display:none}
+#banner{background:#1a0e09;border-color:var(--line);border-radius:12px}
+</style>
+</head>
+<body>
+<div class="sbar"></div>
+<div class="wrap">
+  <header><span class="logo"><i></i>Flow</span><span class="top"><span id="date"></span><button id="refresh" hidden title="Get the latest from Todoist">Refresh</button><button id="signout" hidden>Sign out</button></span></header>
+  <main id="v"></main>
+</div>
+<div id="banner" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+if(location.protocol==="http:"&&location.hostname.endsWith("saimsunny.net"))location.replace("https://"+location.host+location.pathname+location.search+location.hash);
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,"0");
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dur=m=>{m=Math.max(0,Math.round(m));const h=Math.floor(m/60),r=m%60;return h?(r?`${h} h ${pad(r)}`:`${h} h`):`${r} min`};
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,today=()=>iso(new Date()),plus=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+let undoFn=null;
+function banner(x,un){const b=$("#banner"),k=Date.now();b.dataset.k=k;undoFn=un||null;b.innerHTML=esc(x||"")+(un?`<button id="undo">Undo</button>`:"");b.hidden=!x;
+  if(x)setTimeout(()=>{if(b.dataset.k==k){b.hidden=true;undoFn=null}},un?9000:7000)}
+
+/* ---------- sound, vibration, notifications: Flow reaches him while he is in another app ---------- */
+let AC=null;
+function beep(f=660,d=.12,v=.06,t=0){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),a=AC.currentTime+t;o.frequency.value=f;g.gain.setValueAtTime(v,a);g.gain.exponentialRampToValueAtTime(.0001,a+d);o.connect(g).connect(AC.destination);o.start(a);o.stop(a+d)}catch(e){}}
+/* inside the iPhone app the phone itself does notifications and haptics (see apple/Flow/FlowWebView.swift) */
+const NB=window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.flow,nat=m=>{try{NB&&NB.postMessage(m)}catch(e){}};
+const buzz=p=>{if(NB)return nat({type:"haptic",kind:Array.isArray(p)?"notify":"tap"});try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+/* the phone gets the times up front, so it can notify while Flow is in the background */
+function natPlan(){if(!NB)return;nat({type:"cancel"});if(!S)return;const now=Date.now(),c=S.steps[S.ticked],sl=S.min*60-(now-S.at)/1000;
+  if(c){const l=c[1]*60-(now-(S.stepAt||S.at))/1000;if(l>1)nat({type:"schedule",id:"step",seconds:l,title:"Time's up for this step",body:c[0]});
+    if(l+300>1)nat({type:"schedule",id:"nudge",seconds:l+300,title:"Still on this step?",body:c[0]})}
+  if(sl>1)nat({type:"schedule",id:"session",seconds:sl,title:"Session time is up",body:"Check in when you're ready."})}
+const sTick=()=>{beep(880,.09);buzz(20)},sChime=()=>{beep(660,.18,.07);beep(880,.18,.07,.16);beep(1100,.32,.07,.32);buzz([40,60,40])},sWarn=()=>{beep(520,.2,.06);beep(520,.2,.06,.3);buzz([80,80,80])};
+function askNotify(){nat({type:"permission"});try{if("Notification" in window&&Notification.permission==="default")Notification.requestPermission()}catch(e){}}
+function notify(title,body){try{if("Notification" in window&&Notification.permission==="granted"&&document.hidden)new Notification(title,{body,tag:"flow",icon:"icon-192.png"})}catch(e){}}
+/* speak instead of typing */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+/* inside the iPhone app the phone listens (apple/Flow/FlowWebView.swift) and sends the words back here */
+const NSP=!!NB&&window.flowNative>=2,CAN=NSP||(!!SR&&!NB);let natMic=null;
+window.flowSpeech=text=>{if(natMic)natMic.t.value=(natMic.base?natMic.base+" ":"")+text};
+window.flowSpeechEnd=why=>{if(!natMic)return;natMic.btn.classList.remove("on");natMic.btn.textContent="Speak";natMic=null;if(why==="denied")banner("Allow Microphone and Speech Recognition for Flow in the iPhone Settings.")};
+const ta=(attrs,ph,val)=>`<div class="ta"><textarea ${attrs} placeholder="${esc(ph)}">${esc(val)}</textarea>${CAN?`<button type="button" class="mic" data-mic="1">Speak</button>`:""}</div>`;
+function mic(btn){const t=btn.parentElement.querySelector("textarea,input");if(NSP){if(natMic){nat({type:"speak",on:false});return}natMic={btn,t,base:t.value.trim()};btn.classList.add("on");btn.textContent="Stop";nat({type:"speak",on:true});return}
+  if(rec){rec.stop();return}
+  rec=new SR();rec.lang="en-US";rec.interimResults=false;rec.continuous=true;btn.classList.add("on");btn.textContent="Stop";
+  rec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)t.value=(t.value?t.value.trim()+" ":"")+e.results[i][0].transcript.trim()};
+  rec.onend=rec.onerror=()=>{rec=null;btn.classList.remove("on");btn.textContent="Speak"};try{rec.start()}catch(e){rec=null}}
+/* floating mini timer: a small always-on-top window (Chrome on a computer) */
+let pip=null;
+const pipSet=(a,b)=>{try{pip.document.getElementById("n").textContent=a;pip.document.getElementById("s").textContent=b}catch(e){}};
+async function popOut(){if(!("documentPictureInPicture" in window))return banner("The floating timer works in Chrome on a computer.");
+  try{pip=await documentPictureInPicture.requestWindow({width:320,height:150})}catch(e){return}
+  pip.document.body.innerHTML=`<style>body{margin:0;background:#0b0908;color:#f7f4f0;font-family:Manrope,Helvetica,Arial,sans-serif;display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:14px 16px;height:100vh;box-sizing:border-box}#n{font-size:44px;font-weight:600;letter-spacing:-.04em;line-height:1}#s{font-size:12px;opacity:.6;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:210px}button{width:52px;height:52px;border-radius:50%;border:0;background:rgba(255,122,47,.25);color:#ff7a2f;font-size:22px;cursor:pointer}</style><div><div id="n"></div><div id="s"></div></div><button id="ok" title="Done, next step">✓</button>`;
+  pip.document.getElementById("ok").onclick=()=>{if(S&&S.steps[S.ticked])doTick();else window.focus()};pip.addEventListener("pagehide",()=>{pip=null});render()}
+
+/* ---------- state ---------- */
+let sb=null,uid=null,todo=null,work={},view="load",cur=null;
+let D=null;   // start screen: {qs, ans:{i:optionIndex}, w:{i:text}, min}
+let S=null;   // running session, also saved as state/work: {task,name,min,steps:[[t,min]],ticked,drift,at,stepAt}
+let C=null;   // check-in: {ticked, more, block:Set, note, after}
+let tick=null,busy="",Wn=null; // Wn: what the win screen shows after a check-in
+
+/* ---------- data: the same Supabase docs table as before ---------- */
+async function loadAll(first){const {data,error}=await sb.from("docs").select("collection,id,data").in("collection",["meta","work","state","tasks"]);
+  if(error){banner("Couldn't load your data. Check your connection.");return}
+  const w={},m={};let st=null;
+  for(const r of data){if(r.collection==="meta"&&r.id==="todoist")todo=r.data;else if(r.collection==="meta"&&r.id==="flowtasks")imported=true;else if(r.collection==="meta"&&r.id==="today")cal=r.data;else if(r.collection==="tasks")m[r.id]=r.data;else if(r.collection==="work")w[r.id]=r.data;else if(r.collection==="state"&&r.id==="work")st=r.data}
+  work=w;mine=m;loaded=true;if(first&&st&&Array.isArray(st.steps)){S=st;cur={id:st.task,name:st.name};view="run"}}
+function save(c,id,d){return sb.from("docs").upsert({user_id:uid,collection:c,id,data:d,updated_at:new Date().toISOString()}).then(({error})=>{if(error)banner("Couldn't save: "+error.message)})}
+function drop(c,id){return sb.from("docs").delete().match({user_id:uid,collection:c,id}).then(()=>{})}
+const saveS=()=>{natPlan();return S&&save("state","work",S)};
+/* the server: Gemini and the Todoist/calendar sync */
+async function fn(body,ms=25000){try{const r=await Promise.race([sb.functions.invoke("flow-chat",{body}),new Promise(z=>setTimeout(()=>z({error:1}),ms))]);return r&&!r.error&&r.data&&!r.data.error?r.data:null}catch(e){return null}}
+let syncing=false;
+async function calSync(force){const last=TD?(todo&&todo.syncedAt)||0:(cal&&cal.date===today()?cal.syncedAt||0:0);if(!force&&Date.now()-last<(TD?3e4:12e5))return;const r=await fn({mode:"sync"},40000);if(r){await loadAll(false);if(view==="home")render()}}
+async function sync(){if(syncing)return;syncing=true;$("#refresh").textContent="Refreshing…";await calSync(false);await loadAll(false);syncing=false;$("#refresh").textContent="Refresh";if(view==="home")render()}
+
+/* ---------- tasks: they live in Flow (collection tasks). Todoist was only read once, to move the list over ---------- */
+/* TD = true: the list comes from Todoist again (Sunny, 15 Nov). false = tasks live in Flow (add box, brain dump, repeat; kept in flow-own-tasks.html too) */
+const TD=true;if(TD)document.documentElement.classList.add("td");
+let mine={},loaded=false,imported=false,menuId=null,E=null,cal=null,B=null; // cal: today's calendar events; B: brain dump {text,list,busy}
+const newId=()=>"t_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function putTask(id,t){mine={...mine,[id]:t};return save("tasks",id,t)}
+function delTask(id){const m={...mine};delete m[id];mine=m;return drop("tasks",id)}
+/* repeating tasks: repeat is "month" or a list of weekdays (0 = Sunday). Finishing one moves it to its next day. */
+const DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],nice=d=>new Date(d+"T12:00").toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+const normRep=r=>r==="month"?"month":r==="day"?[0,1,2,3,4,5,6]:r==="weekdays"?[1,2,3,4,5]:Array.isArray(r)&&r.length?[...new Set(r.map(Number).filter(n=>n>=0&&n<7))].sort():null;
+const repLabel=r=>!r?"":r==="month"?"Every month":r.length===7?"Every day":r.join()==="1,2,3,4,5"?"Weekdays":(r.length===1?"Every ":"")+r.map(n=>DN[n]).join(", ");
+function nextDue(t,incl){const t0=today();if(t.repeat==="month"){const d=new Date((t.due||t0)+"T12:00");do d.setMonth(d.getMonth()+1);while(iso(d)<=t0);return iso(d)}
+  const d=new Date((t.due&&t.due>t0?t.due:t0)+"T12:00");if(!incl)d.setDate(d.getDate()+1);for(let i=0;i<8&&!t.repeat.includes(d.getDay());i++)d.setDate(d.getDate()+1);return iso(d)}
+function finishTask(id,quiet){const old=mine[id];if(!old)return;
+  if(old.repeat){const nd=nextDue(old),hid=newId();putTask(hid,{name:old.name,due:old.due||null,done:Date.now(),createdAt:old.createdAt||Date.now(),copy:1});putTask(id,{...old,due:nd});
+    if(!quiet)banner(`Done: ${old.name}. Next: ${nice(nd)}`,()=>{putTask(id,old);delTask(hid)})}
+  else{putTask(id,{...old,done:Date.now()});if(!quiet)banner(`Done: ${old.name}`,()=>putTask(id,old))}}
+function tasks(){const t=today(),tm=plus(1);const src=TD?((todo&&todo.tasks)||[]).filter(x=>!W("td_"+x.id).fin).map(x=>["td_"+x.id,{name:x.content,due:String(x.dueDate||"").slice(0,10)||null}]):Object.entries(mine).filter(([,x])=>!x.done);
+  return src.map(([id,x])=>{const due=x.due||"";
+  return {id,name:x.name,due,repeat:x.repeat||null,at:x.createdAt||0,group:!due?"Someday":due<=t?"Today":due===tm?"Tomorrow":"Later",late:!!due&&due<t}}).sort((a,b)=>(a.due||"9").localeCompare(b.due||"9")||a.at-b.at)}
+async function importTodoist(){if(TD||imported)return;let L=null;const r=await fn({mode:"tdall"},30000);
+  if(r&&Array.isArray(r.tasks))L=r.tasks;else if(todo&&Array.isArray(todo.tasks)&&todo.tasks.length)L=todo.tasks;
+  if(!L)return; // no answer: try again next time Flow opens, nothing is marked as moved
+  await loadAll(false);if(imported)return; // another device finished it meanwhile
+  for(const x of L){const id="td_"+x.id,w=work[id]||{};if(mine[id])continue;
+    await putTask(id,{name:String(x.content||"").slice(0,200),due:String(x.dueDate||"").slice(0,10)||null,done:w.fin?(w.updated||Date.now()):null,createdAt:Date.now(),from:"todoist"})}
+  await save("meta","flowtasks",{imported:Date.now(),count:L.length});imported=true;banner(`Moved ${L.length} task${L.length===1?"":"s"} from Todoist into Flow.`);if(view==="home")render()}
+/* one-second add: the date is read from the last words ("Call GBTL tomorrow", "Invoice fri", "Send files on 21 nov", "Learn Blender someday") */
+const WD=["sun","mon","tue","wed","thu","fri","sat"],MO=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+function parseAdd(raw){let x=String(raw).trim().replace(/\s+/g," "),due=today();const d0=new Date();d0.setHours(12,0,0,0);
+  const at=n=>{const d=new Date(d0);d.setDate(d.getDate()+n);return iso(d)},md=(dd,mo)=>{const d=new Date(d0.getFullYear(),mo,dd,12);if(d<d0&&iso(d)!==iso(d0))d.setFullYear(d.getFullYear()+1);return iso(d)};
+  const P="(?:\\s+(?:on|by|due|for|before))?\\s+",Z="[.!]?$",mon="(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*";
+  const tries=[[`(someday|some day|no date|whenever)`,()=>null],[`(today|tonight)`,()=>at(0)],[`(tomorrow|tmrw|tmr|morgen)`,()=>at(1)],[`next week`,()=>at((8-d0.getDay())%7||7)],
+    [`in (\\d{1,2}) days?`,m=>at(+m[1])],
+    [`(?:next )?(mon|tue|wed|thu|fri|sat|sun)(?:day|sday|nesday|rsday|urday|s|r|rs)?`,m=>at(((WD.indexOf(m[1].toLowerCase())-d0.getDay()+7)%7)||7)],
+    [`(\\d{1,2})(?:st|nd|rd|th)? ?${mon}`,m=>md(+m[1],MO.indexOf(m[2].toLowerCase()))],[`${mon} (\\d{1,2})(?:st|nd|rd|th)?`,m=>md(+m[2],MO.indexOf(m[1].toLowerCase()))]];
+  for(const [re,f] of tries){const m=x.match(new RegExp(P+re+Z,"i"));if(m&&m.index>0){due=f(m);x=x.slice(0,m.index).trim();break}}
+  return {name:x.replace(/[\s,;:-]+$/,"").slice(0,200),due}}
+/* "Gym every mon wed fri", "Vlog every day", "Rent every month", "Invoices weekly" */
+function parseFull(raw){let x=String(raw).trim().replace(/\s+/g," "),rep=null,wk=false,m;const dd="(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*";
+  if((m=x.match(/\s+(every ?day|daily)[.!]?$/i)))rep=[0,1,2,3,4,5,6];
+  else if((m=x.match(/\s+(every weekday|on weekdays|weekdays)[.!]?$/i)))rep=[1,2,3,4,5];
+  else if((m=x.match(/\s+(every month|monthly)[.!]?$/i)))rep="month";
+  else if((m=x.match(/\s+(every week|weekly)[.!]?$/i)))wk=true;
+  else if((m=x.match(new RegExp(`\\s+every ((?:${dd})(?:(?:\\s*,\\s*|\\s*/\\s*|\\s+and\\s+|\\s+)(?:${dd}))*)[.!]?$`,"i"))))rep=normRep((m[1].toLowerCase().match(/mon|tue|wed|thu|fri|sat|sun/g)||[]).map(k=>WD.indexOf(k)));
+  if(m&&m.index>0)x=x.slice(0,m.index);else{rep=null;wk=false}
+  const r=parseAdd(x);if(wk)rep=[new Date((r.due||today())+"T12:00").getDay()];
+  if(rep&&rep!=="month"){if(!r.due)r.due=today();r.due=nextDue({due:r.due,repeat:rep},true)}
+  return {...r,repeat:rep}}
+function addTask(raw){const {name,due,repeat}=parseFull(raw);if(!name)return false;putTask(newId(),{name,due,done:null,createdAt:Date.now(),...(repeat?{repeat}:{})});buzz(15);return true}
+const W=id=>work[id]||{};
+/* what Gemini learns about how he really works: from the check-ins of his last sessions, over all tasks */
+function habits(){const all=Object.values(work).flatMap(w=>w.sessions||[]).sort((a,b)=>b.at-a.at).slice(0,30);if(all.length<2)return "";
+  const sum=k=>all.reduce((a,x)=>a+(+x[k]||0),0),min=sum("min"),bl={};all.forEach(x=>(x.block||[]).forEach(b=>bl[b]=(bl[b]||0)+1));
+  const top=Object.entries(bl).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([b,n])=>`${b} (${n}x)`).join(", ");
+  return `In his last ${all.length} sessions he finished ${Math.round(sum("done")/(sum("of")||1)*100)}% of the planned steps, worked ${Math.round(min/(sum("planned")||1)*100)}% of the planned time, drifted ${(sum("drift")/((min/60)||1)).toFixed(1)} times per hour, and needed about ${Math.round(min/(sum("done")||1))} min per finished step.${top?` What got in the way most: ${top}.`:""}`}
+const payload=t=>{const w=W(t.id),d=new Date();return {task:t.name,due:t.due,answers:w.answers||[],finished:w.finished||[],spent:w.spent||0,left:w.left==null?null:w.left,last:w.last||"",
+  now:`${DN[d.getDay()]} ${pad(d.getHours())}:${pad(d.getMinutes())}, today is ${today()}`,open:(Array.isArray(w.plan)?w.plan:[]).filter(x=>!x[2]).map(x=>x[0]).slice(0,10),
+  history:(w.sessions||[]).slice(-5).map(x=>`${iso(new Date(x.at))}: planned ${x.planned} min, worked ${x.min} min, finished ${x.done} of ${x.of} steps, drifted ${x.drift||0}x${(x.block||[]).length?`, in the way: ${x.block.join(", ")}`:""}${x.note?`, note: ${String(x.note).slice(0,80)}`:""}`),habits:habits()}};
+
+/* ---------- screens ---------- */
+function grab(){const en=$("#en");if(en&&E)E.name=en.value;document.querySelectorAll("[data-w]").forEach(x=>{if(D)D.w[x.dataset.w]=x.value});const n=$("#note");if(n&&C)C.note=n.value;const du=$("#dump");if(du&&B)B.text=du.value}
+function render(){clearInterval(tick);grab();$("#date").textContent=new Date().toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+  if(view!=="run"&&pip){try{pip.close()}catch(e){}pip=null}
+  ({load:vLoad,auth:vAuth,home:vHome,start:vStart,wait:vWait,run:vRun,check:vCheck,win:vWin,edit:vEdit,dump:vDump})[view]()}
+function vLoad(){$("#v").innerHTML=`<p class="think">Opening Flow…</p>`}
+function vWait(){$("#v").innerHTML=`<h1><span>${esc(cur.name)}</span>${esc(busy)}</h1><p class="think">This takes a few seconds.</p>`}
+
+function vHome(){const T=tasks(),g=["Today","Tomorrow","Later","Someday"],t0=today(),tm=plus(1);
+  const done=(TD?Object.entries(work).filter(([id,w])=>w.fin&&id.startsWith("td_")).map(([id,w])=>[id,{name:w.name||"Task",done:w.updated||0}]):Object.entries(mine)).filter(([,x])=>x.done&&iso(new Date(x.done))===t0).sort((a,b)=>b[1].done-a[1].done);
+  // one gentle suggestion: overdue first, then the one he already started, then anything due today
+  const sc=t=>(t.late?4:0)+(W(t.id).spent?2:0)+1,pk=T.filter(t=>t.group==="Today").sort((a,b)=>sc(b)-sc(a))[0];
+  let h=`<h1 class="big">Today</h1><p class="sub">${T.filter(t=>t.group==="Today").length} for today · ${T.length} open</p>
+  <form id="add" class="add ta"><input id="new" placeholder="Add a task. e.g. Call GBTL tomorrow" autocomplete="off" maxlength="200" enterkeyhint="done" aria-label="Add a task">${CAN?`<button type="button" class="mic" data-mic="1">Speak</button>`:""}</form>
+  <div class="rowl"><span>Add “every mon wed fri” or “every day” to repeat.</span><button class="link" data-act="dump">Brain dump</button></div>`;
+  const nowM=new Date().getHours()*60+new Date().getMinutes(),hm=x=>+x.slice(0,2)*60+ +x.slice(3,5),ev=cal&&cal.date===t0&&Array.isArray(cal.events)?cal.events:[];
+  if(ev.length)h+=`<div class="cal" aria-label="Today in your calendar">${ev.map(x=>`<span class="${x.end&&hm(x.end)<=nowM?"past":""}"><b>${x.start?esc(x.start):"All day"}</b>${esc(x.title)}</span>`).join("")}</div>`;
+  const openToday=T.filter(t=>t.group==="Today");
+  if(new Date().getHours()>=18&&openToday.length)h+=`<div class="card eve"><span>Evening. ${openToday.length} still open for today.</span><button class="link" data-act="rollover">Move to tomorrow</button></div>`;
+  if(!loaded||(TD&&!todo))h+=`<p class="think">Getting your tasks from Todoist…</p>`;
+  else if(!T.length)h+=`<div class="card note" style="margin-top:16px">${TD?"Nothing open in Todoist for the next two weeks.":imported?"Nothing open. Type a task above and press Enter.":"Moving your list over from Todoist…"}</div>`;
+  else h+=g.map(d=>{const L=T.filter(t=>t.group===d);return L.length?`<div class="k">${d}</div><div class="tasks">${L.map(t=>{const w=W(t.id),l=w.left||0,p=w.spent?Math.round(w.spent/(w.spent+l||1)*100):0,open=menuId===t.id,pl=Array.isArray(w.plan)?w.plan:[];
+    return `<div class="card ${pk&&pk.id===t.id?"pick":""}"><div class="trow2"><button class="main" data-open="${esc(t.id)}"><b>${esc(t.name)}</b><span class="arrow">→</span>
+      ${w.spent?`<span class="bar"><i style="width:${p}%"></i></span>`:""}
+      <span class="meta">${pk&&pk.id===t.id?`<em>${w.spent?"Pick up where you stopped":"Start here"}</em> · `:""}${t.late?"<em>Overdue</em> · ":""}${w.spent?`${dur(w.spent)} done · ${w.left!=null?dur(w.left)+" left":"some left"}`:"Not started"}${pl.length?` · ${pl.filter(x=>x[2]).length}/${pl.length} steps`:""}${t.repeat?` · ↻ ${esc(repLabel(t.repeat))}`:""}${d==="Later"?` · ${esc(nice(t.due))}`:""}</span></button>
+      <button class="more" data-menu="${esc(t.id)}" aria-label="More for ${esc(t.name)}" aria-expanded="${open}">⋯</button></div>
+      ${open?`<div class="chips tacts"><button data-tdone="${esc(t.id)}">Done</button>${t.due===t0?"":`<button data-tmove="${esc(t.id)}|${t0}">Today</button>`}${t.due===tm?"":`<button data-tmove="${esc(t.id)}|${tm}">Tomorrow</button>`}${t.due?`<button data-tmove="${esc(t.id)}|">Someday</button>`:""}<button data-tedit="${esc(t.id)}">Edit</button><button data-tdel="${esc(t.id)}">Delete</button></div>${kept(t.id,"")}`:""}</div>`}).join("")}</div>`:""}).join("");
+  if(done.length)h+=`<div class="k">Done today · tap to bring one back</div><ul class="donel">${done.map(([id,x])=>`<li><button data-treopen="${esc(id)}">${esc(x.name)}</button></li>`).join("")}</ul>`;
+  $("#v").innerHTML=h}
+/* the steps Gemini made stay on the task: what is done and what is still open */
+function kept(id,cls){const w=W(id),pl=Array.isArray(w.plan)?w.plan:[],old=(w.finished||[]).filter(x=>!pl.some(p=>p[0]===x)).slice(-12);
+  return pl.length||old.length?`<ul class="kept ${cls}">${old.map(x=>`<li class="d">✓ ${esc(x)}</li>`).join("")}${pl.map(x=>`<li class="${x[2]?"d":""}">${x[2]?"✓":"○"} ${esc(x[0])}</li>`).join("")}</ul>`:""}
+function vDump(){const L=B.list;$("#v").innerHTML=`<h1><span>Empty your head,</span>Flow sorts it.</h1><p class="lead">Type or speak everything on your mind, in any order. It becomes separate tasks with dates.</p>`+
+  (L?`<div class="k">${L.length} task${L.length===1?"":"s"} found · tap × to drop one</div><ul class="card dl">${L.map((t,i)=>`<li><div>${esc(t.name)}<small>${t.due?esc(t.due===today()?"Today":t.due===plus(1)?"Tomorrow":nice(t.due)):"Someday"}${t.repeat?" · ↻ "+esc(repLabel(t.repeat)):""}</small></div><button class="x" data-dumpx="${i}" aria-label="Drop ${esc(t.name)}">×</button></li>`).join("")}</ul>
+    <div class="acts"><button class="btn go" data-act="dumpadd" ${L.length?"":"disabled"}>Add ${L.length} task${L.length===1?"":"s"}</button><button class="btn" data-act="dumpback">Change the text</button><button class="btn ghost" data-act="home">Cancel</button></div>`
+  :`${ta('id="dump"',"e.g. call GBTL tomorrow, send Robbin the corrected file friday, buy SD cards, invoice for Rafa next week, gym every mon wed fri",B.text)}
+    <div class="acts"><button class="btn go" data-act="dumpgo" ${B.busy?"disabled":""}>${B.busy?"Sorting…":"Sort it out"}</button><button class="btn ghost" data-act="home">Cancel</button></div>`)}
+async function dumpGo(){if(!B||!B.text.trim())return;B.busy=true;render();const cap=x=>x.charAt(0).toUpperCase()+x.slice(1);
+  const r=await fn({mode:"dump",text:B.text.slice(0,4000)},40000);if(!B)return;
+  let L=r&&Array.isArray(r.tasks)?r.tasks.map(t=>{const rep=normRep(t.repeat),o={name:String(t.name||"").trim().slice(0,200),due:/^\d{4}-\d\d-\d\d$/.test(t.due||"")?t.due:null,repeat:rep};if(rep&&rep!=="month")o.due=nextDue({due:o.due||today(),repeat:rep},true);return o}).filter(t=>t.name):null;
+  if(!L||!L.length)L=B.text.split(/\n+|[;•]|,\s+|\.\s+|\s+and then\s+|\s+also\s+/i).map(x=>x.trim().replace(/^(and|then|i need to|i have to|i must|i should)\s+/i,"")).filter(x=>x.length>2).map(x=>{const o=parseFull(x);return {...o,name:cap(o.name)}}).filter(t=>t.name);
+  B.busy=false;B.list=L.slice(0,40);if(view==="dump")render()}
+function vEdit(){const t0=today(),tm=plus(1),rp=E.repeat,isA=Array.isArray(rp);$("#v").innerHTML=`<h1><span>Edit</span>task</h1>
+  <input id="en" value="${esc(E.name)}" maxlength="200" aria-label="Task name">
+  <div class="k">When</div><div class="chips"><button data-edue="${t0}" aria-pressed="${E.due===t0}">Today</button><button data-edue="${tm}" aria-pressed="${E.due===tm}">Tomorrow</button><button data-edue="" aria-pressed="${!E.due}">Someday</button></div>
+  <input id="ed" type="date" value="${esc(E.due||"")}" style="margin-top:10px" aria-label="Pick a date">
+  <div class="k">Repeat</div><div class="chips"><button data-erep="no" aria-pressed="${!rp}">No</button><button data-erep="day" aria-pressed="${isA&&rp.length===7}">Every day</button><button data-erep="month" aria-pressed="${rp==="month"}">Every month</button></div>
+  <div class="chips" style="margin-top:8px">${[1,2,3,4,5,6,0].map(n=>`<button data-eday="${n}" aria-pressed="${isA&&rp.includes(n)}">${DN[n]}</button>`).join("")}</div>
+  ${kept(E.id,"flat")?`<div class="k">Steps so far</div>${kept(E.id,"flat")}`:""}
+  <div class="acts"><button class="btn go" data-act="esave">Save</button><button class="btn ghost" data-act="home">Back</button></div>`}
+
+/* questions Flow can ask without Gemini (first time only), when the server doesn't answer */
+function basicQs(t,first){if(!first)return [];
+  if(/edit|film|video|trailer|reel|vivaah|wedding|reception|highlight|cut\b/i.test(t.name))return [
+    {q:"How long is the finished piece?",kind:"options",options:["Under 5 min","10 min","30 min","60 min","90 min"]},
+    {q:"Where are you with it?",kind:"options",options:["Not started","Footage imported","Cameras synced","Rough cut done","Almost finished"]},
+    {q:"Anything I should know?",kind:"write",placeholder:"Optional. e.g. Client wants the speeches kept long."}];
+  if(/correction|fix|revision|feedback/i.test(t.name))return [{q:"What needs to be corrected?",kind:"write",placeholder:"e.g. Fix the colour in the garden scene, shorten the intro."}];
+  return [{q:"What exactly needs to happen?",kind:"write",placeholder:"Optional. A sentence in your own words."}]}
+function untils(){const d=new Date(),n=d.getHours()*60+d.getMinutes(),out=[];for(let h=d.getHours()+1,i=0;i<3;i++,h++){const m=h*60-n;if(m>=20)out.push([m,`Until ${pad(h%24)}:00`])}return out}
+async function openTask(t){cur=t;const first=!W(t.id).spent;D={qs:null,ans:{},w:{},min:null};view="start";render();scrollTo(0,0);
+  const r=await fn({mode:"wask",...payload(t)},15000);if(cur!==t||view!=="start")return;
+  const qs=r&&Array.isArray(r.questions)?r.questions.filter(q=>q&&q.q&&(q.kind==="write"||(Array.isArray(q.options)&&q.options.length>1))).slice(0,4):null;
+  D.qs=qs||basicQs(t,first);render()}
+function vStart(){const t=cur,w=W(t.id),first=!w.spent;
+  const mins=[[25,"25 min"],[45,"45 min"],[60,"1 hour"],[90,"1 h 30"],[120,"2 hours"],[180,"3 hours"],...untils()];
+  $("#v").innerHTML=`<h1><span>${first?"Starting":"Back to"}</span>${esc(t.name)}</h1>
+  ${first?"":`<div class="card note">${dur(w.spent)} done${w.left!=null?`, about <b>${dur(w.left)}</b> left`:""}.${(w.finished||[]).length?` Last finished: <b>${esc(w.finished[w.finished.length-1])}</b>.`:""}${w.last?` Last time: ${esc(w.last)}.`:""}</div>`}
+  ${D.qs==null?`<p class="think">Thinking about what to ask…</p>`:D.qs.map((q,i)=>`<div class="ask">${esc(q.q)}</div>`+(q.kind==="write"
+      ?ta(`data-w="${i}"`,q.placeholder||"In your own words",D.w[i]||"")
+      :`<div class="chips">${q.options.map((o,j)=>`<button data-ans="${i}|${j}" aria-pressed="${D.ans[i]===j}">${esc(o)}</button>`).join("")}</div><input class="own" data-w="${i}" placeholder="Or type your own answer" value="${esc(D.w[i]||"")}">`)).join("")}
+  <div class="k">How long are you going to work?</div><div class="chips">${mins.map(([m,l])=>`<button data-min="${m}" aria-pressed="${D.min===m}">${l}</button>`).join("")}</div>
+  <div class="acts"><button class="btn go" data-act="begin" ${D.min?"":"disabled"}>Start</button><button class="btn ghost" data-act="home">Back</button></div>`}
+
+async function begin(){const t=cur,w={...W(t.id)},min=D.min;askNotify();beep(440,.02,.0001);
+  const ans=(D.qs||[]).map((q,i)=>({q:q.q,a:(D.w[i]||"").trim()||(q.kind!=="write"&&D.ans[i]!=null?q.options[D.ans[i]]:"")})).filter(x=>x.a);
+  // a newer answer to the same question replaces the old one
+  w.answers=[...(w.answers||[]).filter(o=>!ans.some(n=>n.q===o.q)),...ans].slice(-12);w.name=t.name;work={...work,[t.id]:w};
+  busy="Cutting it into small steps…";view="wait";render();
+  let steps=null,left=null,why="",r=await fn({mode:"wsteps",...payload(t),minutes:min},40000);
+  if(r&&Array.isArray(r.steps)){steps=r.steps;left=+r.left||null;why=String(r.note||"").trim().slice(0,160)}
+  else{ // the older server function can also cut a block into small tasks
+    const about=[t.name,...w.answers.map(a=>`${a.q} ${a.a}`),(w.finished||[]).length?`Already finished: ${w.finished.slice(-8).join("; ")}. Continue after that.`:"",w.last?`Last time: ${w.last}`:""].filter(Boolean).join(". ");
+    r=await fn({mode:"small",job:t.name,steps:[about.slice(0,118)],minutes:Math.max(15,min)},40000);if(r&&Array.isArray(r.tasks))steps=r.tasks}
+  steps=(steps||[]).map(x=>[String(x.t||"").trim().slice(0,120),Math.max(2,Math.min(90,Math.round(+x.min||10)))]).filter(x=>x[0]&&!/^stand up/i.test(x[0]));
+  if(!steps.length){steps=[[t.name,min]];banner("Flow's AI didn't answer, so this session is one step.")}
+  let a=0;steps=steps.filter(s=>(a+=s[1])<=min*1.15||a===s[1]);
+  if(w.left==null)w.left=left||steps.reduce((x,s)=>x+s[1],0);else if(left)w.left=Math.round((w.left+left)/2);
+  work={...work,[t.id]:w};save("work",t.id,w);
+  S={task:t.id,name:t.name,min,steps,ticked:0,drift:0,at:Date.now(),stepAt:Date.now()};saveS();D=null;view="run";render();scrollTo(0,0);if(why)banner(why)}
+
+/* work screen: the big clock counts down the CURRENT small step; the bar is this session's steps, the needle where he is in the step */
+function doTick(){if(!S||!S.steps[S.ticked])return;S.ticked++;S.stepAt=Date.now();S.told=S.asked=0;S.nudge=false;saveS();S.steps[S.ticked]?sTick():sChime();render()}
+function doDrift(){if(!S)return;S.drift++;S.pullAt=Date.now();saveS();buzz(30);render()}
+/* stuck, or a step is too big: Gemini cuts just that step into tiny ones */
+async function smaller(i){const st=S.steps[i],w=W(S.task);banner("Making it smaller…");
+  const r=await fn({mode:"wsteps",task:`${S.name}. Only this step: ${st[0]}`,answers:w.answers||[],finished:[],spent:0,left:st[1],minutes:Math.max(15,st[1]),
+    last:"He is stuck on this one step and cannot start. Break ONLY this step into 2 to 4 tiny steps. The first takes 5 minutes and is almost too easy."},40000);
+  const L=r&&Array.isArray(r.steps)?r.steps.map(x=>[String(x.t||"").trim().slice(0,120),Math.max(2,Math.min(60,Math.round(+x.min||5)))]).filter(x=>x[0]):[];
+  if(!S||S.steps[i]!==st)return;if(L.length<2)return banner("Couldn't split it. Try renaming it to something smaller.");
+  S.steps.splice(i,1,...L);if(i===S.ticked){S.stepAt=Date.now();S.told=S.asked=0}S.nudge=false;saveS();banner("");render()}
+function vRun(){const c=S.steps[S.ticked],n=S.steps.length;
+  const paint=()=>{const now=Date.now(),sl=S.min*60-(now-S.at)/1000,se=$("#sess");
+    if(se)se.textContent=(sl>=0?`${Math.ceil(sl/60)} min left in this session`:`${Math.ceil(-sl/60)} min over your session time`)+` · step ${Math.min(S.ticked+1,n)} of ${n}`;
+    if(sl<0&&!S.endTold){S.endTold=1;saveS();sChime();notify("Session time is up","Check in when you're ready.")}
+    if(S.pullAt&&now-S.pullAt>12000){S.pullAt=0;const p=$("#pull");if(p)p.remove()}
+    if(!c){if(pip)pipSet("Done","Check in in Flow");return}
+    const el=(now-(S.stepAt||S.at))/1000,l=c[1]*60-el,a=Math.abs(l),txt=(l<0?"+":"")+Math.floor(a/60)+":"+pad(Math.floor(a%60));
+    $("#cd").textContent=txt;$("#cdl").textContent=l<0?"Over on this step":"Left for this step";
+    $("#needle").style.left=Math.min(100,el/(c[1]*60)*100)+"%";document.title=`${txt} · ${c[0]}`;if(pip)pipSet(txt,c[0]);
+    if(l<0&&!S.told){S.told=1;sWarn();notify("Time's up for this step",c[0])}
+    if(l<-300&&!S.asked){S.asked=1;S.nudge=true;saveS();sWarn();notify("Still on this step?",c[0]);render()}};
+  $("#v").innerHTML=`<h1><span>${esc(S.name)}</span>${c?esc(c[0]):"All done for this session."}</h1>
+  ${c?`<div class="card timer"><div class="trow"><div><div class="num" id="cd"></div><div class="tl" id="cdl"></div></div><button class="ok" data-act="tick" aria-label="Done, next step">✓</button></div>
+    <div class="segs">${S.steps.map((s,i)=>`<div class="seg ${i<S.ticked?"d":i===S.ticked?"c":""}" style="flex:${s[1]}" title="${esc(s[0])}">${i===S.ticked?`<span class="needle" id="needle"></span><span class="tag" style="${i<n/2?"left:0":"right:0"}"><b>${i+1}</b><span>${esc(s[0])}</span></span>`:""}</div>`).join("")}</div>
+    <div class="sess" id="sess"></div>${"ontouchstart" in window?`<div class="sess" style="margin-top:4px">Swipe right when it's done, left if you drifted.</div>`:""}</div>`:`<p class="lead" id="sess"></p>`}
+  ${S.nudge&&c?`<div class="card nudge"><b>Still on this step?</b><div class="chips"><button data-act="more5">5 more minutes</button><button data-act="tick">It's done</button><button data-act="stuck">I'm stuck</button></div></div>`:""}
+  ${S.pullAt&&c?`<p class="lead" id="pull" style="margin:14px 0 0;color:var(--fg)">Back to it: ${esc(c[0])}. Just the next 2 minutes.</p>`:""}
+  <div class="acts">${c?"":`<button class="btn go" data-act="stop">Check in</button>`}<button class="btn" data-act="drift">I drifted${S.drift?` · ${S.drift}`:""}</button>${c?`<button class="btn" data-act="stop">Stop</button>`:""}<button class="btn ghost" data-act="switch">Switch task</button>
+    ${c?`<button class="btn ghost" data-act="edit">${S.edit?"Hide steps":"Edit steps"}</button>`:""}${c&&"documentPictureInPicture" in window&&!pip?`<button class="btn ghost" data-act="pop">Floating timer</button>`:""}</div>
+  ${S.edit&&c?`<ul class="ed card">${S.steps.map((s,i)=>i<S.ticked?"":`<li><div class="er"><button class="nm" data-ren="${i}" title="Tap to rename">${esc(s[0])}</button><time>${dur(s[1])}</time></div>
+    <div class="eb"><button data-up="${i}">Up</button><button data-dn="${i}">Down</button><button data-add="${i}">+5 min</button><button data-split="${i}">Split smaller</button><button data-del="${i}">Remove</button></div></li>`).join("")}</ul>`:""}`;
+  paint();tick=setInterval(paint,1000)}
+
+function toCheck(after){const w=W(S.task),done=S.steps.slice(0,S.ticked).reduce((a,s)=>a+s[1],0);
+  C={ticked:S.ticked,more:Math.max(0,Math.round(((w.left!=null?w.left:S.steps.reduce((a,s)=>a+s[1],0))-done)/5)*5),block:new Set(),note:"",after};view="check";document.title="Flow";render();scrollTo(0,0)}
+function vCheck(){const B=["Nothing","Phone","People","Tired","Technical issue","Unclear what to do"],worked=Math.max(1,Math.round((Date.now()-S.at)/6e4));
+  $("#v").innerHTML=`<h1><span>Check in · ${dur(worked)} worked</span>How did it go?</h1>
+  <div class="k">What did you finish? Tap to change</div><ul class="steps card">${S.steps.map((s,i)=>`<li class="${i<C.ticked?"d":""}"><button data-upto="${i}"><i></i><span>${esc(s[0])}</span><time>${dur(s[1])}</time></button></li>`).join("")}</ul>
+  <div class="k">How much more does the whole job need?</div><div class="stepper"><button class="btn" data-more="-30">− 30</button><b>${C.more?dur(C.more):"Finished"}</b><button class="btn" data-more="30">+ 30</button><button class="btn ghost" data-more="0">It's finished</button></div>
+  <div class="k">What got in the way?</div><div class="chips">${B.map(b=>`<button data-block="${b}" aria-pressed="${C.block.has(b)}">${b}</button>`).join("")}</div>
+  <div class="k">Anything to remember for next time?</div>${ta('id="note"',"Optional. e.g. Export crashed, try a smaller preset.",C.note)}
+  <div class="acts"><button class="btn go" data-act="save">Save${C.after==="switch"?" and pick the next task":""}</button><button class="btn ghost" data-act="back">Keep working</button></div>`}
+function saveCheck(){const id=S.task,w={...W(id)},worked=Math.max(1,Math.round((Date.now()-S.at)/6e4)),b=[...C.block].filter(x=>x!=="Nothing");
+  w.name=S.name;w.finished=[...(w.finished||[]),...S.steps.slice(0,C.ticked).map(s=>s[0])].slice(-80);w.plan=S.steps.map((x,i)=>[x[0],x[1],i<C.ticked?1:0]).slice(0,40);w.spent=(w.spent||0)+worked;w.left=C.more;w.fin=C.more===0;w.updated=Date.now();
+  w.last=[S.drift?`drifted ${S.drift}×`:"",b.join(", ").toLowerCase(),C.note.trim()].filter(Boolean).join(". ").slice(0,500);
+  if(w.fin&&mine[id]){finishTask(id,true);if(mine[id].repeat){w.fin=false;w.left=null;w.spent=0;w.plan=[];w.finished=[]}}
+  w.sessions=[...(w.sessions||[]).slice(-40),{at:S.at,min:worked,planned:S.min,done:C.ticked,of:S.steps.length,drift:S.drift,block:b,note:C.note.trim()}];
+  work={...work,[id]:w};save("work",id,w);drop("state","work");Wn={name:S.name,done:C.ticked,of:S.steps.length,min:worked,left:C.more,fin:w.fin,pct:w.fin?100:Math.round(w.spent/((w.spent+C.more)||1)*100),streak:streak(w)};
+  S=null;C=null;cur=null;view="win";natPlan();sChime();render();scrollTo(0,0)}
+/* days in a row with a session on this task, ending today */
+function streak(w){const days=new Set((w.sessions||[]).map(x=>iso(new Date(x.at))));let n=0;for(const d=new Date();days.has(iso(d));d.setDate(d.getDate()-1))n++;return n}
+function vWin(){const x=Wn;$("#v").innerHTML=`<h1><span>${esc(x.name)}</span>${x.fin?"Finished. Well done.":x.done?`${x.done} step${x.done>1?"s":""} done.`:"You showed up."}</h1>
+  <div class="card win"><div class="num">${dur(x.min)}</div><div class="tl">focused${x.done?` · ${x.done} of ${x.of} steps`:""}</div><div class="bar big"><i style="width:${x.pct}%"></i></div>
+    <div class="sess">${x.fin?"This one is done.":`About ${dur(x.left)} left on this job.`}${x.streak>1?` ${x.streak} days in a row on this one.`:""}</div></div>
+  <div class="acts"><button class="btn go" data-act="winok">Pick the next thing</button></div>`}
+
+/* ---------- sign in ---------- */
+function vAuth(){$("#v").innerHTML=`<h1><span>Welcome back,</span>sign in to Flow.</h1>
+  <form class="auth" id="auth"><input id="em" type="email" autocomplete="username" placeholder="Email" required><input id="pw" type="password" autocomplete="current-password" placeholder="Password" required>
+  <div class="acts" style="margin-top:6px"><button class="btn go">Sign in</button><button type="button" class="btn ghost" data-act="forgot">Forgot password</button></div><div class="msg" id="amsg"></div></form>`}
+function vNewPw(){$("#v").innerHTML=`<h1><span>Almost there,</span>choose a new password.</h1>
+  <form class="auth" id="newpw"><input id="np" type="password" autocomplete="new-password" placeholder="New password (8+ characters)" minlength="8" required>
+  <div class="acts" style="margin-top:6px"><button class="btn go">Save password</button></div><div class="msg" id="amsg"></div></form>`}
+
+/* ---------- events ---------- */
+document.addEventListener("change",e=>{if(e.target.id==="ed"&&E){E.due=e.target.value||null;render()}});
+document.addEventListener("keydown",e=>{if((e.key==="n"||e.key==="N")&&view==="home"&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();const i=$("#new");i&&i.focus()}});
+document.addEventListener("submit",async e=>{e.preventDefault();const f=e.target;
+  if(f.id==="add"){const i=$("#new");if(addTask(i.value)){render();const n=$("#new");n&&n.focus()}return}
+  if(f.id==="auth"){$("#amsg").textContent="Signing in…";const {error}=await sb.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});
+    if(error)$("#amsg").textContent="Couldn't sign in: "+error.message;else location.reload()}
+  if(f.id==="newpw"){const {error}=await sb.auth.updateUser({password:$("#np").value});if(error)$("#amsg").textContent="Couldn't save it: "+error.message;else{history.replaceState(null,"",location.pathname);location.reload()}}});
+document.addEventListener("click",async e=>{const el=e.target.closest("button");if(!el)return;const d=el.dataset;
+  if(el.id==="signout"){await sb.auth.signOut();return location.reload()}
+  if(el.id==="refresh")return sync();
+  if(el.id==="undo"){const u=undoFn;banner("");if(u){u();render()}return}
+  if(d.mic)return mic(el);
+  if(d.act==="forgot"){const em=$("#em").value.trim();if(!em){$("#amsg").textContent="Type your email first.";return}
+    const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});$("#amsg").textContent=error?"Couldn't send: "+error.message:"Check your email for the reset link.";return}
+  grab();
+  if(d.open){const t=tasks().find(x=>x.id===d.open);if(!t)return;if(W(t.id).fin)work={...work,[t.id]:{...W(t.id),fin:false,left:30}};menuId=null;return openTask(t)}
+  if(d.menu)menuId=menuId===d.menu?null:d.menu;
+  else if(d.tdone){finishTask(d.tdone);menuId=null;sTick()}
+  else if(d.tmove){const [id,due]=d.tmove.split("|");putTask(id,{...mine[id],due:due||null});menuId=null}
+  else if(d.tedit){E={id:d.tedit,name:mine[d.tedit].name,due:mine[d.tedit].due||null,repeat:normRep(mine[d.tedit].repeat)};menuId=null;view="edit"}
+  else if(d.tdel){const id=d.tdel,old=mine[id];delTask(id);menuId=null;banner(`Deleted: ${old.name}`,()=>putTask(id,old))}
+  else if(d.treopen){if(TD){const id=d.treopen,w={...W(id),fin:false,left:30};work={...work,[id]:w};save("work",id,w)}else putTask(d.treopen,{...mine[d.treopen],done:null})}
+  else if(d.edue!=null)E.due=d.edue||null;
+  else if(d.erep){E.repeat=d.erep==="day"?[0,1,2,3,4,5,6]:d.erep==="month"?"month":null}
+  else if(d.eday!=null){const n=+d.eday,a=Array.isArray(E.repeat)?E.repeat:[];E.repeat=normRep(a.includes(n)?a.filter(x=>x!==n):[...a,n])}
+  else if(d.act==="esave"){const nm=E.name.trim();if(nm){const t={...mine[E.id],name:nm.slice(0,200),due:E.due};if(E.repeat){t.repeat=E.repeat;if(E.repeat!=="month")t.due=nextDue({due:E.due||today(),repeat:E.repeat},true);else if(!t.due)t.due=today()}else delete t.repeat;putTask(E.id,t)}E=null;view="home"}
+  else if(d.act==="dump"){B={text:"",list:null,busy:false};view="dump"}
+  else if(d.act==="dumpgo")return dumpGo();
+  else if(d.act==="dumpback")B.list=null;
+  else if(d.dumpx!=null)B.list.splice(+d.dumpx,1);
+  else if(d.act==="dumpadd"){const L=B.list,ids=[];L.forEach((t,i)=>{const id=newId()+i;ids.push(id);putTask(id,{name:t.name,due:t.due,done:null,createdAt:Date.now()+i,from:"dump",...(t.repeat?{repeat:t.repeat}:{})})});B=null;view="home";sTick();banner(`Added ${L.length} task${L.length===1?"":"s"}.`,()=>ids.forEach(delTask))}
+  else if(d.act==="rollover"){const tm=plus(1),olds=tasks().filter(t=>t.group==="Today").map(t=>[t.id,mine[t.id]]);olds.forEach(([id,o])=>putTask(id,{...o,due:tm}));banner(`Moved ${olds.length} to tomorrow.`,()=>olds.forEach(([id,o])=>putTask(id,o)))}
+  else   if(d.ans){const [i,j]=d.ans.split("|");D.ans[i]=D.ans[i]===+j?null:+j}
+  else if(d.min)D.min=+d.min;
+  else if(d.act==="home"){view="home";D=null;cur=null;E=null;B=null}
+  else if(d.act==="begin")return begin();
+  else if(d.act==="tick")return doTick();
+  else if(d.act==="drift")return doDrift();
+  else if(d.act==="stop"||d.act==="switch")return toCheck(d.act);
+  else if(d.act==="back"){C=null;view="run"}
+  else if(d.upto!=null)C.ticked=(+d.upto+1===C.ticked)?+d.upto:+d.upto+1;
+  else if(d.more!=null)C.more=+d.more===0?0:Math.max(0,C.more+ +d.more);
+  else if(d.block){d.block==="Nothing"?C.block=new Set(["Nothing"]):(C.block.delete("Nothing"),C.block.has(d.block)?C.block.delete(d.block):C.block.add(d.block))}
+  else if(d.act==="save")return saveCheck();
+  else if(d.act==="winok"){Wn=null;view="home"}
+  else if(d.act==="more5"){S.steps[S.ticked][1]+=5;S.nudge=false;S.told=S.asked=0;saveS()}
+  else if(d.act==="stuck"){S.nudge=false;return smaller(S.ticked)}
+  else if(d.act==="edit")S.edit=!S.edit;
+  else if(d.act==="pop")return popOut();
+  else if(d.up!=null||d.dn!=null){const i=+(d.up!=null?d.up:d.dn),j=d.up!=null?i-1:i+1;if(j<S.ticked||j>=S.steps.length)return;
+    [S.steps[i],S.steps[j]]=[S.steps[j],S.steps[i]];if(i===S.ticked||j===S.ticked){S.stepAt=Date.now();S.told=S.asked=0}saveS()}
+  else if(d.add!=null){S.steps[+d.add][1]+=5;if(+d.add===S.ticked)S.told=S.asked=0;saveS()}
+  else if(d.del!=null){if(S.steps.length-S.ticked<2)return banner("That's the last step. Use Stop to end the session.");S.steps.splice(+d.del,1);if(+d.del===S.ticked){S.stepAt=Date.now();S.told=S.asked=0}saveS()}
+  else if(d.ren!=null){const v=prompt("Rename this step",S.steps[+d.ren][0]);if(!v||!v.trim())return;S.steps[+d.ren][0]=v.trim().slice(0,120);saveS()}
+  else if(d.split!=null)return smaller(+d.split);
+  else return;
+  render()});
+
+/* phone: swipe right = step done, swipe left = drifted */
+let tx=0,ty=0;document.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.addEventListener("touchend",e=>{if(view!=="run"||!S||e.target.closest(".ed,button,textarea"))return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dy)>60||Math.abs(dx)<90)return;dx>0?doTick():doDrift()},{passive:true});
+
+/* ---------- start, and quiet updates when a new version is published ---------- */
+const BUILD="2026-11-15-h";
+async function checkUpdate(){try{const r=await fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"});if(!r.ok)return;const m=(await r.text()).match(/const BUILD="([^"]+)"/);
+  if(m&&m[1]!==BUILD&&view==="home")location.reload()}catch(e){}}
+setInterval(checkUpdate,5*6e4);
+document.addEventListener("visibilitychange",()=>{if(document.hidden||!uid)return;checkUpdate();if(view==="home"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))sync()});
+(async()=>{render();const cfg=window.FLOW_CLOCK_CONFIG||{};
+  if(!window.supabase||!cfg.supabaseUrl){$("#v").innerHTML=`<h1><span>Flow can't start.</span>Check your connection and reload.</h1>`;return}
+  sb=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  let {data:{session}}=await sb.auth.getSession();
+  if(session){const {error}=await sb.auth.getUser();if(error&&!/fetch|network/i.test(error.message||"")){await sb.auth.signOut({scope:"local"});session=null}}
+  if(/type=recovery/.test(location.hash)&&session)return vNewPw();
+  if(!session){view="auth";return render()}
+  uid=session.user.id;$("#signout").hidden=false;$("#refresh").hidden=false;
+  await loadAll(true);if(view==="load")view="home";natPlan();render();
+  importTodoist();calSync(TD);
+  if(NB)fn({mode:"watchkey"}).then(r=>{if(r&&r.key)nat({type:"watch",key:r.key,anon:cfg.supabaseAnonKey,url:cfg.supabaseUrl})})})();
+/* a step ticked on the Apple Watch (or another device) shows up here within a few seconds */
+setInterval(async()=>{if(!uid||view!=="run"||!S||document.hidden)return;const at=S.at;
+  const {data}=await sb.from("docs").select("data").match({collection:"state",id:"work"}).maybeSingle();const r=data&&data.data;
+  if(!r||!S||view!=="run"||r.at!==at||S.at!==at)return;
+  if(r.ticked>S.ticked||(r.drift||0)>(S.drift||0)){const more=r.ticked>S.ticked;S={...S,ticked:Math.max(r.ticked,S.ticked),drift:Math.max(r.drift||0,S.drift||0),...(more?{stepAt:r.stepAt||Date.now(),told:0,asked:0,nudge:false}:{})};natPlan();if(more)sTick();render()}},8000);
+</script>
+</body>
+</html>
